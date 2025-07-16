@@ -31,11 +31,14 @@ env/
 *.swp
 *.swo
 
-# Test files
-test_image.jpg
-result.png
+# Logs
+*.log
 
-# Environment variables
+# Local development
 .env
 .env.local
-.env.*.local 
+.env.*.local
+
+# System Files
+.DS_Store
+Thumbs.db 

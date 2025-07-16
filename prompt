@@ -1,0 +1,132 @@
+# Railway Background Removal API - Cursor AI Prompt
+
+Create a complete FastAPI application for background removal that can be deployed on Railway. The API should work with a Hugging Face background removal model and serve as an endpoint for the frontend at bgpeel.com.
+
+## Deployment Approach
+The RECOMMENDED approach for deployment is using the Railway MCP Server that's already installed. This provides direct API access to Railway's services and enables:
+- Automated project creation
+- Direct GitHub repository integration
+- Environment configuration
+- Service deployment and monitoring
+- Domain setup
+
+The Railway MCP Server provides tools like:
+- `mcp_Railway_MCP_Server_project_create` - Create new Railway project
+- `mcp_Railway_MCP_Server_service_create_from_repo` - Deploy from GitHub
+- `mcp_Railway_MCP_Server_domain_create` - Set up custom domains
+- `mcp_Railway_MCP_Server_variable_set` - Configure environment variables
+
+## Model Information:
+This API should replicate the functionality from: https://huggingface.co/spaces/not-lain/background-removal
+- Uses REMBG library with SILUETA model
+- Same processing pipeline as the working Hugging Face space
+- Optimized for portrait and general image background removal
+
+### 1. Project Structure
+Create the following file structure:
+```
+bg-removal-api/
+├── main.py
+├── requirements.txt
+├── Dockerfile (optional, Railway can auto-detect)
+├── railway.toml (optional configuration)
+└── README.md
+```
+
+### 2. FastAPI Application (main.py)
+- Create a FastAPI app with CORS enabled for bgpeel.com
+- Implement a POST endpoint `/remove-background` that:
+  - Accepts image uploads (PNG, JPG, JPEG)
+  - Processes the image using a Hugging Face background removal model
+  - Returns the processed image with transparent background
+- Add health check endpoint `/health`
+- Include proper error handling and validation
+- Add file size limits (e.g., 10MB max)
+- Use the `rembg` library with the SILUETA model (same as the Hugging Face space)
+
+### 3. Dependencies (requirements.txt)
+Based on the Hugging Face space at https://huggingface.co/spaces/not-lain/background-removal, include these packages:
+```
+fastapi
+uvicorn[standard]
+python-multipart
+pillow
+rembg[new]
+numpy
+gradio
+```
+
+### 4. Key Features to Implement:
+- **Image Processing**: Use the exact same implementation as the Hugging Face space:
+  - Import: `from rembg import remove, new_session`
+  - Create session: `session = new_session('silueta')`
+  - Process: `remove(input_image, session=session)`
+- **CORS Configuration**: Allow requests from bgpeel.com and localhost
+- **Error Handling**: Proper HTTP status codes and error messages
+- **File Validation**: Check file types and sizes
+- **Response Format**: Return processed image as base64 or direct file response
+- **Memory Management**: Clean up temporary files and optimize memory usage
+
+### 5. Implementation Reference:
+Based on the Hugging Face space code, the core processing should be:
+```python
+from rembg import remove, new_session
+from PIL import Image
+import io
+
+def remove_background(input_image):
+    session = new_session('silueta')
+    output = remove(input_image, session=session)
+    return output
+```
+
+### 5. API Endpoints:
+- `POST /remove-background` - Main background removal endpoint
+- `GET /health` - Health check endpoint
+- `GET /` - Basic info about the API
+
+### 6. Railway Configuration:
+- Add environment variables for configuration
+- Set up proper startup command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+- Configure Railway deployment settings
+
+### 7. Docker Configuration (if needed):
+Create a Dockerfile that:
+- Uses Python 3.9+ base image
+- Installs dependencies efficiently
+- Exposes the correct port
+- Runs the FastAPI application
+
+### 8. Security & Performance:
+- Add rate limiting if possible
+- Implement proper file cleanup
+- Add logging for debugging
+- Set reasonable timeout limits
+
+### 9. Testing:
+- Include a simple test script to verify the API works
+- Add example curl commands in README
+
+### 10. Documentation:
+- Create a comprehensive README with:
+  - Setup instructions
+  - API documentation
+  - Railway deployment steps
+  - Environment variables needed
+  - Example usage
+
+## Example API Usage:
+The API should accept multipart/form-data with an image file and return either:
+- Base64 encoded image with transparent background
+- Direct image file response
+- JSON response with processed image data
+
+## Railway Deployment Notes:
+- Railway will auto-detect Python and install dependencies
+- Make sure to set the start command properly
+- Consider using Railway's persistent storage if needed
+- Set up environment variables for any API keys or configurations
+
+Please create a production-ready API that can handle multiple concurrent requests and is optimized for Railway's infrastructure.
+
+Please create the project for the API inside railway using the railway mcp. Make a new github repo for the project aswell using the github mcp server.
