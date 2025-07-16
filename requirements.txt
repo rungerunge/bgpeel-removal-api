@@ -2,7 +2,7 @@ fastapi==0.95.0
 uvicorn[standard]==0.21.1
 python-multipart==0.0.6
 Pillow==9.5.0
-rembg==2.0.30
+rembg==2.0.50
 numpy==1.24.2
 requests==2.28.2
 python-dotenv==1.0.0 
